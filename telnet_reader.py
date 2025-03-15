@@ -5,7 +5,7 @@ import time
 # Constant & Settings
 ENABLE_DISPLAY = True
 KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN = b'\xe0K', b'\xe0H', b'\xe0M', b'\xe0P'
-with open("login_info.txt", "r") as f:
+with open("config.txt", "r") as f:
     ADDRESS = f.readline().strip()
     USER = f.readline().strip()
     PASSWORD = f.readline().strip()
@@ -76,8 +76,7 @@ def taversal_board(num = 10):
     for idx in range(1, num+1):
         copy_post(idx)
     
-select_board()
-taversal_board(BOARD_IDX)
+select_board(BOARD_IDX)
+taversal_board()
 
 tn.close()
-
