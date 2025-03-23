@@ -1,6 +1,14 @@
 # Telnet-Crawler  
 A tool to download and read posts from a BBS server via Telnet.  
 
+## Setup
+1. Ensure Python 3 is installed.
+2. If using Python 3.13+, install `telnetlib-313-and-up`:
+   ```
+   pip install pip install telnetlib-313-and-up
+   ```
+   (This is not needed for earlier Python 3 versions, as telnetlib is built-in.)
+
 ## Downloading from the BBS Server  
 1. Edit `example-config.txt` and rename it to `config.txt`.  
 2. In `telnet_reader.py` (line 138), update the board index to specify which board you want to download from.  
