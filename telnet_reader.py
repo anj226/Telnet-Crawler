@@ -11,6 +11,7 @@ class Telnet_Reader():
         self.config_path = "config.txt"
         self.enable_display = True
         self.page_break = b"\xff\xff\xff"
+        self.post_break = b"\xfe\xfe\xfe"
         self.delay_before_read = 1
 
         self.read_config()
@@ -109,20 +110,43 @@ class Telnet_Reader():
     #         save_path = Path("bbs_posts") / (f"{board_name}-{str((max_num + 99) // 100)}.bin")
     #         # self.copy_post(idx, save_path)
     
+    @staticmethod
+    def title_extract(content):
+        pos_author = content.find(b"\x1b[34;47m \xe4\xbd\x9c\xe8\x80\x85 \x1b[37;44m ".decode()) + 21 # 作者
+        pos_title = content.find(b"\x1b[34;47m \xe6\xa8\x99\xe9\xa1\x8c \x1b[37;44m ".decode()) + 21 # 標題
+        pos_date = content.find(b"\x1b[34;47m \xe6\x99\x82\xe9\x96\x93 \x1b[37;44m ".decode()) + 21 # 時間
+        author = content[pos_author:pos_title].split(" ")[0]
+        title = content[pos_title:pos_date].split("\x1b[m")[0].strip()
+        date = content[pos_date:].split(" ")[0]
+
+        return f"{date} {author} {title}"
+
+
     def taversal_board(self, board_name, max_post_num = 10):
         """Download and save a BBS post with structured naming using pathlib."""
-        self.tn.write(b"1\n")  # To the top
-        self.read_telnet_output(
-            wait_for_bytes="文章列表".encode("big5hkscs")
-        )
-        self.tn.write(b"\n")  # Confirm selection
-        
-        i, recv = 0, ""
-        while i < max_post_num:
-            save_path = Path("bbs_posts") / (f"{board_name}-{i // 100}.bin")
-            recv = self.read_telnet_output(save_path=save_path, fixed=False)
-            self.tn.write(b" ")  # Press space to load more content
-            if "選讀" in recv:  i += 1
+        dst_dir = Path(f"bbs_posts/{board_name}")
+        dst_dir.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
+        with open(dst_dir / "index.txt", "w")  as index_file:
+            self.tn.write(b"1\n")  # To the top
+            self.read_telnet_output(
+                wait_for_bytes="文章列表".encode("big5hkscs")
+            )
+            self.tn.write(b"\n")  # Confirm selection
+            
+            i, recv, first_page = 0, "", True
+            while i < max_post_num:
+                save_path = dst_dir / (f"{board_name}-{i // 100}.bin")
+                recv = self.read_telnet_output(save_path=save_path, fixed=False)
+                self.tn.write(b" ")  # Press space to load more content
+                if first_page:
+                    first_page = False
+                    title = self.title_extract(recv)
+                    index_file.write( f"{i} {title}\n" )
+                if "選讀" in recv:
+                    with open(save_path, "ab") as f:
+                        f.write(self.post_break) # self-defined post break symbol
+                    i += 1
+                    first_page = True
 
             
     def download_board(self, board_idx):
