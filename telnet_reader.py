@@ -2,7 +2,7 @@ from telnetlib import Telnet
 import time
 from pathlib import Path
 import re
-from decode_tools import remove_double_colored
+from decode_tools import remove_double_colored, POST_BREAK, PAGE_BREAK
 from displayer import Displayer
 
 class Telnet_Reader():
@@ -10,8 +10,6 @@ class Telnet_Reader():
         # Constant & Settings
         self.config_path = "config.txt"
         self.enable_display = True
-        self.page_break = b"\xff\xff\xff"
-        self.post_break = b"\xfe\xfe\xfe"
         self.delay_before_read = 1
 
         self.read_config()
@@ -35,7 +33,7 @@ class Telnet_Reader():
         if save_path:
             with open(save_path, "ab") as f:
                 f.write(content)
-                f.write(self.page_break) # self-defined page break symbol
+                f.write(PAGE_BREAK) # self-defined page break symbol
 
         if self.enable_display:
             self.displayer.display_bbs_data(content, fixed)
@@ -122,7 +120,7 @@ class Telnet_Reader():
         return f"{date} {author} {title}"
 
 
-    def taversal_board(self, board_name, max_post_num = 10):
+    def taversal_board(self, board_name, max_post_num = 200):
         """Download and save a BBS post with structured naming using pathlib."""
         dst_dir = Path(f"bbs_posts/{board_name}")
         dst_dir.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
@@ -144,7 +142,7 @@ class Telnet_Reader():
                     index_file.write( f"{i} {title}\n" )
                 if "選讀" in recv:
                     with open(save_path, "ab") as f:
-                        f.write(self.post_break) # self-defined post break symbol
+                        f.write(POST_BREAK) # self-defined post break symbol
                     i += 1
                     first_page = True
 

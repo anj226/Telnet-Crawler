@@ -1,4 +1,6 @@
 import unicodedata
+PAGE_BREAK = b"\xff\xff\xff"
+POST_BREAK = b"\xfe\xfe\xfe"
 def remove_double_colored(text_bytes):
     """Decode byte sequence, handling 'double-colored' characters."""
     result = bytearray()  # We'll accumulate the decoded result here
