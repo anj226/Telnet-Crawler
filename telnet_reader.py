@@ -50,7 +50,6 @@ class Telnet_Reader():
         # TODO: getpass
         self.tn.write(f"{self.USER}\n{self.PASSWORD}\n".encode())
 
-
     def nevigate(self):
         recv = self.read_telnet_output()
         while "精華區與重要訊息" not in recv:   # Check for the main page
@@ -101,12 +100,6 @@ class Telnet_Reader():
             self.tn.write(b" ")  # Press space to load more content
 
         self.tn.write(b"q")  # Quit post view
-
-    # def taversal_board(self, board_name, max_num = 10):
-    #     Path("bbs_posts").mkdir(parents=True, exist_ok=True)  # Ensure directory exists
-    #     for idx in range(1, max_num+1):
-    #         save_path = Path("bbs_posts") / (f"{board_name}-{str((max_num + 99) // 100)}.bin")
-    #         # self.copy_post(idx, save_path)
     
     @staticmethod
     def title_extract(content):
@@ -119,8 +112,7 @@ class Telnet_Reader():
 
         return f"{date} {author} {title}"
 
-
-    def taversal_board(self, board_name, max_post_num = 200):
+    def traversal_board(self, board_name, max_post_num = 200):
         """Download and save a BBS post with structured naming using pathlib."""
         dst_dir = Path(f"bbs_posts/{board_name}")
         dst_dir.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
@@ -145,14 +137,13 @@ class Telnet_Reader():
                         f.write(POST_BREAK) # self-defined post break symbol
                     i += 1
                     first_page = True
-
             
     def download_board(self, board_idx):
         Path("bbs_posts").mkdir(parents=True, exist_ok=True)  # Ensure directory exists
         self.login()
         self.nevigate()
         board_name = self.select_board(board_idx)
-        self.taversal_board(board_name)
+        self.traversal_board(board_name)
         self.tn.close()
 
 if __name__ == "__main__":
