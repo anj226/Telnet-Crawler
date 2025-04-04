@@ -132,7 +132,7 @@ class Telnet_Reader():
                     first_page = False
                     title = self.title_extract(recv)
                     index_file.write( f"{i} {title}\n" )
-                if "選讀" in recv:
+                if "選讀" in recv.split("\n")[-1]:
                     with open(save_path, "ab") as f:
                         f.write(POST_BREAK) # self-defined post break symbol
                     i += 1

@@ -27,7 +27,7 @@ A tool to download and read posts from a BBS server via Telnet.
    ```
 
 ## Reading Downloaded Content  
-1. In `display.py` (line 53), update the `board_name` to match the content you just downloaded.  
+1. In `displayer.py` (line 54), update the `board_name` to match the content you just downloaded.  
 2. Run:  
    ```sh
    python3 display.py

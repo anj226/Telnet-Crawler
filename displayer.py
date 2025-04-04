@@ -18,6 +18,7 @@ class Displayer:
         print(processed_text, end="")
 
     def display_bbs_data(self, data, fixed = False):
+        data = data.strip(b"\r\n")
         self.detect_cursor_position(data)
         if not fixed:
             self.scroll()
@@ -79,8 +80,7 @@ if __name__ == "__main__":
                         post = file.read().split(POST_BREAK)[post_index % 100]
                         pages = post.split(PAGE_BREAK)
                         for page in pages:
-                            data = page.strip(b"\r\n")
-                            if len(data) == 0 : break
+                            if page.strip(b"\r\n") == b"" : break
                             else:
                                 displayer.display_bbs_data(page)
                                 input("\n[Press Enter to continue to next page]\n")
